@@ -1,0 +1,859 @@
+/* =========================================================
+   Wish — Global Styles
+   Personalized, shareable Birthday Surprise Creator.
+   Built on the original visual system (dark-purple gradient,
+   pink/lavender accents). Occasion-agnostic tokens live in
+   :root so future wish types can re-theme by swapping them.
+   ========================================================= */
+
+/* ---------- 1. Design Tokens ---------- */
+:root {
+  /* Occasion theme — swap these to re-skin for other occasions */
+  --color-bg-deep: #150725;
+  --color-bg: #1b0b2e;
+  --color-bg-soft: #2a1150;
+  --color-accent-pink: #ff6ec7;
+  --color-accent-pink-soft: #ffa6dc;
+  --color-accent-lavender: #b98cff;
+  --color-accent-lavender-soft: #d9c2ff;
+  --color-text: #f4eeff;
+  --color-text-muted: #c3b3e0;
+  --color-paper: #fbf6ff;
+  --color-paper-ink: #3a2352;
+
+  --shadow-glow-pink: 0 0 24px rgba(255, 110, 199, 0.55);
+  --shadow-glow-lavender: 0 0 30px rgba(185, 140, 255, 0.45);
+  --shadow-card: 0 24px 60px rgba(0, 0, 0, 0.45);
+
+  --radius-pill: 999px;
+  --radius-card: 24px;
+  --radius-field: 14px;
+
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-body: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  --transition-smooth: 400ms cubic-bezier(0.22, 1, 0.36, 1);
+  --max-width: 560px;
+}
+
+/* ---------- 2. Reset & Base ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-body);
+  color: var(--color-text);
+  background:
+    radial-gradient(1200px 700px at 80% -10%, var(--color-bg-soft) 0%, transparent 60%),
+    radial-gradient(900px 600px at 10% 110%, rgba(185, 140, 255, 0.18) 0%, transparent 55%),
+    linear-gradient(180deg, var(--color-bg-deep) 0%, var(--color-bg) 55%, var(--color-bg-deep) 100%);
+  background-attachment: fixed;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Utility: accessible screen-reader-only text */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- 3. Layout ---------- */
+.page {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.view {
+  flex: 1;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.25rem;
+}
+
+.view.is-active {
+  display: flex;
+}
+
+/* Step views inside recipient mode */
+.step {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 1.25rem;
+  width: 100%;
+  animation: rise-in 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.step.is-active {
+  display: flex;
+}
+
+/* Full-viewport animated backdrop canvas */
+.backdrop-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ---------- 4. Typography ---------- */
+.eyebrow {
+  margin: 0 0 0.5rem;
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  font-size: clamp(0.7rem, 2vw, 0.8rem);
+  font-weight: 500;
+  color: var(--color-accent-lavender-soft);
+  text-indent: 0.5em;
+}
+
+.view__title {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.9rem, 6vw, 3rem);
+  line-height: 1.12;
+  background: linear-gradient(
+    100deg,
+    var(--color-text) 0%,
+    var(--color-accent-pink-soft) 45%,
+    var(--color-accent-lavender-soft) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.view__title--sm {
+  font-size: clamp(1.5rem, 5vw, 2.1rem);
+}
+
+.view__subtitle {
+  margin: 0 auto 1.75rem;
+  max-width: 34rem;
+  font-size: clamp(0.95rem, 2.4vw, 1.05rem);
+  font-weight: 300;
+  color: var(--color-text-muted);
+}
+
+.step__hint {
+  margin: 0;
+  font-size: clamp(0.95rem, 2.4vw, 1.05rem);
+  color: var(--color-text-muted);
+}
+
+.step__hint--cta {
+  font-weight: 500;
+  color: var(--color-accent-lavender-soft);
+}
+
+/* ---------- 5. Buttons ---------- */
+.cta-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.95rem 2.4rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-body);
+  font-size: clamp(1rem, 2.4vw, 1.05rem);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #fff;
+  cursor: pointer;
+  overflow: hidden;
+  isolation: isolate;
+  background: linear-gradient(120deg, var(--color-accent-pink) 0%, var(--color-accent-lavender) 100%);
+  box-shadow: var(--shadow-glow-pink);
+  transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
+}
+
+.cta-button--block {
+  width: 100%;
+}
+
+.cta-button:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-glow-lavender), 0 12px 30px rgba(255, 110, 199, 0.35);
+}
+
+.cta-button:active {
+  transform: translateY(-1px) scale(0.99);
+}
+
+.cta-button:focus-visible,
+.btn-secondary:focus-visible,
+.field__input:focus-visible {
+  outline: 3px solid var(--color-accent-lavender-soft);
+  outline-offset: 3px;
+}
+
+.cta-button__glow {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.35) 50%, transparent 70%);
+  transform: translateX(-120%);
+  animation: sheen 3.5s ease-in-out infinite;
+}
+
+.btn-secondary {
+  padding: 0.7rem 1.4rem;
+  border: 1px solid rgba(185, 140, 255, 0.4);
+  border-radius: var(--radius-pill);
+  background: rgba(185, 140, 255, 0.12);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--transition-smooth), transform var(--transition-smooth);
+}
+
+.btn-secondary:hover {
+  background: rgba(185, 140, 255, 0.24);
+  transform: translateY(-2px);
+}
+
+/* ---------- 6. Creator Card & Form ---------- */
+.creator__card {
+  width: 100%;
+  max-width: var(--max-width);
+  padding: clamp(1.75rem, 5vw, 2.75rem);
+  border-radius: var(--radius-card);
+  background: rgba(42, 17, 80, 0.5);
+  border: 1px solid rgba(185, 140, 255, 0.25);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  animation: rise-in 800ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.wish-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  margin-top: 1.5rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  text-align: left;
+}
+
+.field__label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-accent-lavender-soft);
+  letter-spacing: 0.02em;
+}
+
+.field__input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-field);
+  border: 1px solid rgba(185, 140, 255, 0.3);
+  background: rgba(21, 7, 37, 0.6);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  transition: border-color var(--transition-smooth), box-shadow var(--transition-smooth);
+}
+
+.field__input::placeholder {
+  color: rgba(195, 179, 224, 0.5);
+}
+
+.field__input:focus {
+  border-color: var(--color-accent-pink);
+  box-shadow: 0 0 0 4px rgba(255, 110, 199, 0.15);
+}
+
+.field__input--area {
+  resize: vertical;
+  min-height: 6rem;
+  line-height: 1.5;
+}
+
+.field__input.is-invalid {
+  border-color: #ff7a7a;
+}
+
+.field__help {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+.field__error {
+  margin: 0;
+  min-height: 1rem;
+  font-size: 0.78rem;
+  color: #ff9a9a;
+}
+
+/* ---------- 7. Share Panel ---------- */
+.share {
+  margin-top: 1.75rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(185, 140, 255, 0.2);
+  text-align: left;
+  animation: rise-in 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.share__title {
+  margin: 0 0 1rem;
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: var(--color-accent-pink-soft);
+  text-align: center;
+}
+
+.share__row {
+  display: flex;
+  gap: 0.6rem;
+  align-items: stretch;
+}
+
+.share__input {
+  flex: 1;
+  font-size: 0.85rem;
+  cursor: text;
+}
+
+.share__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.85rem;
+}
+
+.share__note {
+  margin: 1rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}
+
+/* ---------- 8. Envelope ---------- */
+.envelope {
+  position: relative;
+  width: min(320px, 82vw);
+  aspect-ratio: 3 / 2;
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  perspective: 1000px;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.5));
+  transition: transform var(--transition-smooth);
+}
+
+.envelope:hover {
+  transform: translateY(-4px) scale(1.02);
+}
+
+.envelope:focus-visible {
+  outline: 3px solid var(--color-accent-lavender-soft);
+  outline-offset: 6px;
+  border-radius: 12px;
+}
+
+/* Envelope body / pocket */
+.envelope__pocket {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background: linear-gradient(160deg, var(--color-accent-lavender) 0%, #8f5fe0 100%);
+  box-shadow: inset 0 -12px 24px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+/* Triangular flap folds on the pocket */
+.envelope__pocket::before,
+.envelope__pocket::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0));
+}
+
+.envelope__pocket::before {
+  left: 0;
+  clip-path: polygon(0 0, 100% 100%, 0 100%);
+}
+
+.envelope__pocket::after {
+  right: 0;
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+
+/* Top flap that opens */
+.envelope__flap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 56%;
+  border-radius: 12px 12px 0 0;
+  background: linear-gradient(180deg, var(--color-accent-pink-soft) 0%, var(--color-accent-pink) 100%);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transform-origin: top center;
+  transition: transform 900ms cubic-bezier(0.65, 0, 0.35, 1);
+  z-index: 3;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+}
+
+/* Letter peeking out of the pocket */
+.envelope__letter {
+  position: absolute;
+  left: 8%;
+  top: 30%;
+  width: 84%;
+  height: 70%;
+  border-radius: 8px;
+  background: var(--color-paper);
+  z-index: 1;
+  transform: translateY(0);
+  transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1) 300ms;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.envelope__seal {
+  position: absolute;
+  top: 46%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff, var(--color-accent-pink) 70%);
+  box-shadow: var(--shadow-glow-pink);
+  font-size: 1.2rem;
+  z-index: 4;
+  transition: opacity var(--transition-smooth), transform var(--transition-smooth);
+}
+
+/* Opened state */
+.envelope.is-open .envelope__flap {
+  transform: rotateX(-170deg);
+  z-index: 0;
+}
+
+.envelope.is-open .envelope__letter {
+  transform: translateY(-45%);
+}
+
+.envelope.is-open .envelope__seal {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.4);
+}
+
+/* ---------- 9. Letter ---------- */
+.letter {
+  position: relative;
+  width: min(560px, 92vw);
+  padding: clamp(1.75rem, 5vw, 3rem);
+  text-align: left;
+  color: var(--color-paper-ink);
+  background:
+    linear-gradient(180deg, #ffffff 0%, var(--color-paper) 100%);
+  border-radius: 18px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.45);
+  animation: letter-in 800ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Subtle ruled lines like stationery */
+.letter::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 31px,
+    rgba(185, 140, 255, 0.12) 32px
+  );
+  pointer-events: none;
+}
+
+.letter__salutation {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  color: var(--color-accent-lavender);
+}
+
+.letter__headline {
+  margin: 0 0 1rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 6vw, 2.6rem);
+  line-height: 1.1;
+  color: #b0308f;
+}
+
+.letter__message {
+  margin: 0 0 1.5rem;
+  font-size: clamp(1rem, 2.6vw, 1.1rem);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.letter__signature {
+  margin: 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--color-accent-lavender);
+}
+
+/* ---------- 10. Interactive Cake ---------- */
+.cake-stage {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 1rem 0;
+}
+
+/* ---------- Base cake visuals (size, layers, frosting, candles) ---------- */
+.cake {
+  position: relative;
+  width: 260px;
+  height: 220px;
+  margin: 0 auto;
+  filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.45));
+}
+
+/* Each tier: a sponge layer with a frosting cap + drips */
+.cake__tier {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 8px 8px 6px 6px;
+  box-shadow: inset 0 -8px 14px rgba(0, 0, 0, 0.2);
+}
+
+/* Frosting band across the top of the tier */
+.cake__tier::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 15px;
+  background: linear-gradient(180deg, #ffffff 0%, #f3e6ff 100%);
+  border-radius: 8px 8px 0 0;
+}
+
+/* Hanging frosting drips under the band */
+.cake__tier::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 12px;
+  height: 12px;
+  background-image: radial-gradient(circle at 10px 0, #f3e6ff 9px, transparent 10px);
+  background-size: 20px 12px;
+  background-repeat: repeat-x;
+}
+
+/* Bottom (largest) tier — lavender sponge */
+.cake__tier--bottom {
+  bottom: 14px;
+  width: 200px;
+  height: 56px;
+  background: linear-gradient(180deg, #c9a6ff 0%, #a978ff 100%);
+}
+
+/* Middle tier — pink sponge */
+.cake__tier--middle {
+  bottom: 64px;
+  width: 168px;
+  height: 48px;
+  background: linear-gradient(180deg, #ffc0e6 0%, #ff9ad4 100%);
+}
+
+/* Top (smallest) tier — cream sponge */
+.cake__tier--top {
+  bottom: 106px;
+  width: 136px;
+  height: 40px;
+  background: linear-gradient(180deg, #ffffff 0%, #f0e4ff 100%);
+}
+
+/* Cake plate */
+.cake__plate {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 0;
+  width: 240px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* Candles */
+.cake__candle {
+  position: absolute;
+  bottom: 142px;
+  width: 9px;
+  height: 34px;
+  border-radius: 4px;
+  background: repeating-linear-gradient(45deg, #ffffff 0 5px, var(--color-accent-pink) 5px 10px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+}
+
+.cake__candle:nth-of-type(1) { left: 96px; }
+.cake__candle:nth-of-type(2) { left: 126px; }
+.cake__candle:nth-of-type(3) { left: 156px; }
+
+/* Flames */
+.cake__flame {
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 12px;
+  height: 18px;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: radial-gradient(circle at 50% 70%, #fff3b0 0%, #ffb347 45%, #ff7a3d 100%);
+  box-shadow: 0 0 14px 3px rgba(255, 170, 60, 0.7);
+  transform-origin: bottom center;
+  animation: flicker 1.4s ease-in-out infinite;
+}
+
+.cake--interactive {
+  position: relative;
+  cursor: pointer;
+  touch-action: none; /* let JS own vertical drags for cutting */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--transition-smooth);
+}
+
+.cake--interactive:focus-visible {
+  outline: 3px solid var(--color-accent-lavender-soft);
+  outline-offset: 10px;
+  border-radius: 16px;
+}
+
+.cake--interactive.is-cutting {
+  transform: scale(1.03);
+}
+
+/* Knife that follows the pointer during a cut */
+.cake__knife {
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  width: 8px;
+  height: 150px;
+  margin-left: -4px;
+  transform: translateY(-40%) scaleY(0.6);
+  transform-origin: top center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms ease;
+  z-index: 6;
+}
+
+.cake__knife-blade {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #eef2ff 0%, #b9c2e0 60%, #8b93b8 100%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.cake--interactive.is-dragging .cake__knife,
+.cake--interactive.is-cutting .cake__knife {
+  opacity: 1;
+}
+
+/* Cake split halves once cut */
+.cake--interactive.is-cut .cake__tier--top,
+.cake--interactive.is-cut .cake__tier--middle,
+.cake--interactive.is-cut .cake__tier--bottom,
+.cake--interactive.is-cut .cake__plate {
+  transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cake--interactive.is-cut .cake__tier--top,
+.cake--interactive.is-cut .cake__tier--middle,
+.cake--interactive.is-cut .cake__tier--bottom {
+  transform: translateX(-50%) translateX(-14px) rotate(-3deg);
+}
+
+.cake--interactive.is-cut .cake__plate {
+  transform: translateX(-50%) translateX(-14px);
+}
+
+.cake--interactive.is-cut .cake__candle {
+  transform: translateX(-14px) rotate(-3deg);
+  transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ---------- 11. Fireworks / Finale ---------- */
+.step--finale {
+  position: relative;
+  min-height: 70vh;
+  width: 100%;
+}
+
+.fireworks-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.finale__content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+  animation: rise-in 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ---------- 12. Footer ---------- */
+.footer {
+  text-align: center;
+  padding: 1.5rem 1.25rem 2rem;
+}
+
+.footer__text {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  opacity: 0.8;
+}
+
+/* ---------- 13. Keyframes ---------- */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes letter-in {
+  from {
+    opacity: 0;
+    transform: translateY(40px) rotate(-2deg) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(0) scale(1);
+  }
+}
+
+@keyframes sheen {
+  0%,
+  55% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+@keyframes flicker {
+  0%,
+  100% {
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(-50%) scale(1.15) skewX(3deg);
+    opacity: 0.85;
+  }
+}
+
+/* ---------- 14. Responsive ---------- */
+@media (max-width: 640px) {
+  .view {
+    padding: 2rem 1rem;
+  }
+  .share__row {
+    flex-direction: column;
+  }
+  .share__actions .btn-secondary {
+    flex: 1;
+    text-align: center;
+  }
+  .cake {
+    transform: scale(0.9);
+  }
+}
+
+@media (min-width: 1024px) {
+  .view__title {
+    font-size: 3rem;
+  }
+}
+
+/* ---------- 15. Reduced Motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .cta-button__glow,
+  .cake__flame {
+    animation: none !important;
+  }
+}
+
+

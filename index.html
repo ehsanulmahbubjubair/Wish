@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Wish — create a personalized, shareable birthday surprise." />
+  <meta name="theme-color" content="#1b0b2e" />
+  <title>Wish — Create a Birthday Surprise</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Decorative animated background: glowing stars + drifting particles -->
+  <canvas class="backdrop-canvas" id="backdropCanvas" aria-hidden="true"></canvas>
+
+  <div class="page">
+    <!-- ==================== CREATOR MODE ==================== -->
+    <main class="view view--creator is-active" id="creatorView">
+      <div class="creator__card">
+        <p class="eyebrow">Wish</p>
+        <h1 class="view__title">Create a Birthday Surprise</h1>
+        <p class="view__subtitle">
+          Fill in a few details, then share a magical link. Your friend will open
+          an envelope, read your message, cut the cake, and celebrate.
+        </p>
+
+        <form class="wish-form" id="wishForm" novalidate>
+          <div class="field">
+            <label class="field__label" for="recipientName">Recipient's name</label>
+            <input class="field__input" id="recipientName" name="to" type="text"
+                   autocomplete="off" placeholder="e.g. Emma" required
+                   aria-describedby="recipientNameError" />
+            <p class="field__error" id="recipientNameError" role="alert"></p>
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="birthdayNumber">Birthday number</label>
+            <input class="field__input" id="birthdayNumber" name="num" type="text"
+                   autocomplete="off" placeholder="e.g. 18th" required
+                   aria-describedby="birthdayNumberHelp" />
+            <p class="field__help" id="birthdayNumberHelp">Like 1st, 5th, 18th, 30th, 50th…</p>
+            <p class="field__error" id="birthdayNumberError" role="alert"></p>
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="senderName">From (your name)</label>
+            <input class="field__input" id="senderName" name="from" type="text"
+                   autocomplete="off" placeholder="e.g. Alex" required
+                   aria-describedby="senderNameError" />
+            <p class="field__error" id="senderNameError" role="alert"></p>
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="message">Your message</label>
+            <textarea class="field__input field__input--area" id="message" name="msg" rows="4"
+                      placeholder="Write something heartfelt…" required
+                      aria-describedby="messageError"></textarea>
+            <p class="field__error" id="messageError" role="alert"></p>
+          </div>
+
+          <button class="cta-button cta-button--block" id="createWishBtn" type="submit">
+            <span class="cta-button__label">Create Wish</span>
+            <span class="cta-button__glow" aria-hidden="true"></span>
+          </button>
+        </form>
+
+        <div class="share" id="sharePanel" hidden>
+          <h2 class="share__title">Your surprise is ready! 🎁</h2>
+          <label class="field__label" for="shareLink">Shareable link</label>
+          <div class="share__row">
+            <input class="field__input share__input" id="shareLink" type="text" readonly />
+            <button class="btn-secondary" id="copyBtn" type="button">Copy</button>
+          </div>
+          <div class="share__actions">
+            <button class="btn-secondary" id="nativeShareBtn" type="button" hidden>Share…</button>
+            <button class="btn-secondary" id="previewBtn" type="button">Open preview</button>
+            <button class="btn-secondary" id="resetBtn" type="button">Create another</button>
+          </div>
+          <p class="share__note">
+            The details are stored inside the link itself — anyone with the link can read them.
+            Keep it short and avoid private info.
+          </p>
+        </div>
+      </div>
+    </main>
+
+    <!-- ==================== RECIPIENT MODE ==================== -->
+    <main class="view view--recipient" id="recipientView" hidden>
+
+      <!-- Step 1: ENVELOPE -->
+      <section class="step step--envelope is-active" id="envelopeStep" aria-labelledby="envelopeHeading">
+        <h2 class="visually-hidden" id="envelopeHeading">Your surprise envelope</h2>
+        <p class="step__hint">You've received something special…</p>
+
+        <button class="envelope" id="envelopeBtn" type="button" aria-label="Open your envelope to read your letter">
+          <span class="envelope__flap" aria-hidden="true"></span>
+          <span class="envelope__pocket" aria-hidden="true"></span>
+          <span class="envelope__seal" aria-hidden="true">💜</span>
+          <span class="envelope__letter" aria-hidden="true"></span>
+        </button>
+        <p class="step__hint step__hint--cta">Tap the envelope to open it</p>
+      </section>
+
+      <!-- Step 2: LETTER -->
+      <section class="step step--letter" id="letterStep" aria-labelledby="letterHeading" hidden>
+        <article class="letter">
+          <p class="letter__salutation" id="letterSalutation">Dear friend,</p>
+          <h2 class="letter__headline" id="letterHeading">Happy Birthday!</h2>
+          <p class="letter__message" id="letterMessage"></p>
+          <p class="letter__signature" id="letterSignature">— With love</p>
+        </article>
+        <button class="cta-button" id="toCakeBtn" type="button">
+          <span class="cta-button__label">Next Step</span>
+          <span class="cta-button__glow" aria-hidden="true"></span>
+        </button>
+      </section>
+
+      <!-- Step 3: CAKE -->
+      <section class="step step--cake" id="cakeStep" aria-labelledby="cakeHeading" hidden>
+        <h2 class="view__title view__title--sm" id="cakeHeading">Make a wish &amp; cut the cake</h2>
+        <p class="step__hint" id="cakeHint">Swipe down across the cake to slice it.</p>
+
+        <div class="cake-stage" id="cakeStage">
+          <div class="cake cake--interactive" id="cake" role="button" tabindex="0"
+               aria-label="Cake. Swipe down or press Enter to cut it.">
+            <div class="cake__candle"><span class="cake__flame"></span></div>
+            <div class="cake__candle"><span class="cake__flame"></span></div>
+            <div class="cake__candle"><span class="cake__flame"></span></div>
+            <div class="cake__tier cake__tier--top"></div>
+            <div class="cake__tier cake__tier--middle"></div>
+            <div class="cake__tier cake__tier--bottom"></div>
+            <div class="cake__plate"></div>
+            <span class="cake__knife" id="cakeKnife" aria-hidden="true">
+              <span class="cake__knife-blade"></span>
+            </span>
+          </div>
+        </div>
+
+        <button class="btn-secondary" id="cutFallbackBtn" type="button">Cut the Cake</button>
+      </section>
+
+      <!-- Step 4: GRAND FINALE -->
+      <section class="step step--finale" id="finaleStep" aria-labelledby="finaleHeading" hidden>
+        <canvas class="fireworks-canvas" id="fireworksCanvas" aria-hidden="true"></canvas>
+        <div class="finale__content">
+          <h2 class="view__title" id="finaleHeading">Happy Birthday! 🎉</h2>
+          <p class="view__subtitle" id="finaleSubtitle">Wishing you the best day ever.</p>
+          <button class="cta-button" id="replayBtn" type="button">
+            <span class="cta-button__label">Replay the celebration</span>
+            <span class="cta-button__glow" aria-hidden="true"></span>
+          </button>
+        </div>
+      </section>
+
+    </main>
+
+
+    <footer class="footer">
+      <p class="footer__text">Made with 💜 by Wish</p>
+    </footer>
+  </div>
+
+  <!-- Polite live region for screen readers -->
+  <div class="visually-hidden" id="liveRegion" role="status" aria-live="polite"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
